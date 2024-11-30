@@ -1,17 +1,19 @@
-export type userName = {
+import { Model } from 'mongoose';
+
+export type TUserName = {
   firstName: string;
-  middleName?: string;  // Optional for students with middle names
+  middleName?: string; // Optional for students with middle names
   lastName: string;
 };
 
-export type guardian = {
-  name: userName;
+export type TGuardian = {
+  name: TUserName;
   occupation: string;
   contactNo: string;
 };
-export type Student = {
+export type TStudent = {
   id: string;
-  name: userName;
+  name: TUserName;
   email: string;
   phoneNo: string;
   profileImage?: string;
@@ -22,9 +24,19 @@ export type Student = {
   presentAddress: string;
   permanentAddress: string;
   guardian: {
-    mother: guardian;
-    father: guardian;
+    mother: TGuardian;
+    father: TGuardian;
   };
-  localGuardian: guardian;
+  localGuardian: TGuardian;
   isActive: boolean;
 };
+
+export type StudentMethod = {
+  isStudentExist(id: string): Promise<TStudent | null>;
+};
+
+export type StudentModel = Model<
+  TStudent,
+  Record<string, never>,
+  StudentMethod
+>;

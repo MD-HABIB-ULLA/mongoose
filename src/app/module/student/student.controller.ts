@@ -1,23 +1,49 @@
 import { Request, Response } from 'express';
 import { studentServices } from './student.service';
+import { studentValidationSchema } from './student.validation';
+import { z } from 'zod';
 
 const createStudent = async (req: Request, res: Response) => {
   try {
     const student = req.body.student;
-    const result = await studentServices.createStudentIntoDB(student);
-    res.status(200).json({
+
+    // Validate the input using Zod
+    const zodData = studentValidationSchema.parse(student);
+
+    // Save the validated data to the database
+    await studentServices.createStudentIntoDB(zodData);
+
+    res.status(201).json({
       success: true,
-      message: 'Student created successfully',
-      data: result,
+      message: 'Student created successfully.',
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'An error occurred while creating the student',
-      error: error,
-    });
+    if (error instanceof z.ZodError) {
+      // Handle Zod validation errors
+      const formattedErrors = error.errors.map((err) => ({
+        path: err.path.join('.'), // Combine array paths into a readable string
+        message: err.message,
+      }));
+
+      res.status(400).json({
+        success: false,
+        message: 'Validation failed.',
+        errors: formattedErrors,
+      });
+    } else {
+      // Handle other errors
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'An unexpected error occurred.';
+      res.status(500).json({
+        success: false,
+        message: errorMessage,
+      });
+    }
   }
 };
+
 const getAllStudent = async (req: Request, res: Response) => {
   try {
     const result = await studentServices.getAllStudentDataFromDB();
@@ -61,8 +87,6 @@ export const getSingleStudent = async (req: Request, res: Response) => {
     });
   }
 };
-
-
 
 export const studentControllers = {
   createStudent,

@@ -14,9 +14,9 @@ export type Student = {
   name: userName;
   email: string;
   phoneNo: string;
-  profileImage: string;
+  profileImage?: string;
   emergencyContactNo: string;
-  gender: 'Male' | 'Female' ;
+  gender: 'Male' | 'Female' | 'other';
   bloodGroup?: 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
   dateOfBirth?: string; // Format: "YYYY-MM-DD"
   presentAddress: string;

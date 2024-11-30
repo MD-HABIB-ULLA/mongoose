@@ -1,5 +1,7 @@
 import { Schema, model } from 'mongoose';
 import { TStudent, StudentMethod, StudentModel } from './student.interface';
+import bcrypt from 'bcrypt';
+import config from '../../config';
 
 // Guardian schema with validation and error messages
 const GuardianSchema = new Schema({
@@ -126,6 +128,25 @@ const studentSchema = new Schema<TStudent, StudentModel, StudentMethod>({
     required: true,
   },
   isActive: { type: Boolean, default: true },
+  password: { type: String, required: true },
+});
+
+studentSchema.pre('save', async function (next) {
+  // eslint-disable-next-line @typescript-eslint/no-this-alias
+  const user = this;
+
+  user.password = await bcrypt.hash(
+    user.password,
+    Number(config.bcrypt_salt_rounds),
+  );
+
+  next()
+  console.log(user);
+});
+
+studentSchema.post('save', function async() {
+  const user = this;
+  console.log(user);
 });
 
 studentSchema.methods.isStudentExist = async function (id: string) {

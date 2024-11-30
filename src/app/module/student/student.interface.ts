@@ -29,6 +29,7 @@ export type TStudent = {
   };
   localGuardian: TGuardian;
   isActive: boolean;
+  password: string;
 };
 
 export type StudentMethod = {
